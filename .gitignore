@@ -1,0 +1,23 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+
+# Environment variables
+.env
+.env.production
+.env.development
+
+# IDEs and editors
+.vscode/
+
+# uploads
+uploads/
+
+#sercrets
+secrets/
+
+#docker
+docker-compose.dev.yml
+docker-compose.prod.yml
