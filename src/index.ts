@@ -5,6 +5,7 @@ import helmet from "helmet";
 // import apiRouter from "@routes/index";
 // import { errorHandler } from "@middlewares/handler";
 import { env } from "@config/env";
+import apiRouter from "@routes/index";
 
 AppDataSource.initialize();
 
@@ -20,6 +21,7 @@ app.use(cors({
   }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
+app.use("/api", apiRouter); //
 app.get('/health', (req, res) => {
     res.status(200).json({ 
         status: 'ok', 
