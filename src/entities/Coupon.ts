@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Shop } from "./Shop";
-import { Shopkeeper } from "./Shopkeeper";
+import { Shopkeeper } from "./ShopKeeper";
 
 @Entity()
 export class Coupon {

@@ -1,10 +1,12 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+
 import path from "path";
 import { env } from "./env";
 
 const isProduction = env.ENV === "production" || process.env.NODE_ENV === "production";
 const fileExt = isProduction ? "js" : "ts";
+
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -13,9 +15,10 @@ export const AppDataSource = new DataSource({
   username: env.DB_USERNAME,
   password: env.DB_PASSWORD,
   database: env.DB_NAME,
-  entities: [path.resolve(__dirname, `../entities/**/*.${fileExt}`)],
+  // entities: [path.resolve(__dirname, `../entities/**/*.${fileExt}`)],
+  entities: [path.join(process.cwd(), "src/entities/**/*.{ts,js}")], 
   migrations: [path.resolve(__dirname, `../migrations/**/*.${fileExt}`)],
-  synchronize: false,
+  synchronize: true,
   logging: env.ENV === 'development',
   extra: {
     connectionLimit: 30,     // Allow 30 active connections

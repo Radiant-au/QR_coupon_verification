@@ -1,5 +1,5 @@
 import { ShopKeeperRepository } from "@repositories/ShopKeeperRepository";
-import { Shopkeeper } from "@entities/Shopkeeper";
+import { Shopkeeper } from "@entities/ShopKeeper";
 
 export class ShopKeeperService {
     async getAll() {

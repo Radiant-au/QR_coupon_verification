@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Coupon } from "./Coupon";
-import { Shopkeeper } from "./Shopkeeper";
+import { Shopkeeper } from "./ShopKeeper";
 
 @Entity()
 export class Shop {
