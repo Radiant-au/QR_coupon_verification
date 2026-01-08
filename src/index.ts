@@ -2,8 +2,8 @@ import express from "express";
 import cors from "cors";
 import { AppDataSource } from "@config/data-source";
 import helmet from "helmet";
-// import apiRouter from "@routes/index";
-// import { errorHandler } from "@middlewares/handler";
+import apiRouter from "@routes/index";
+import { errorHandler } from "@middlewares/handler";
 import { env } from "@config/env";
 
 AppDataSource.initialize();
@@ -31,14 +31,14 @@ app.get('/health', (req, res) => {
 // app.use('/', cors({}), express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req , res) => {
-    res.send('Welcome to the vote API');
+    res.send('Welcome to the vote AP');
 });
 
 // Mount all routes under /api
-// app.use("/api", apiRouter);
+app.use("/api", apiRouter);
 
 // Error handler MUST be last!
-// app.use(errorHandler);
+app.use(errorHandler);
 
 
 
