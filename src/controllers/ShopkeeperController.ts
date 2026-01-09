@@ -1,55 +1,66 @@
+
 import { Request, Response } from "express";
 import { ShopkeeperService } from "../services/ShopkeeperService";
+import { asyncHandler } from "../middlewares/handler"; // Adjust path based on your project
 
-// Instantiate the service to use its methods
 const shopkeeperService = new ShopkeeperService();
 
 export class ShopkeeperController {
   
-  static async getAll(req: Request, res: Response) {
-    try {
-      const result = await shopkeeperService.findAll(); // Handshake with findAll
-      res.json(result);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+  // GET ALL
+  static getAll = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await shopkeeperService.findAll();
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
     }
-  }
+  );
 
-  static async getOne(req: Request, res: Response) {
-    try {
-      const result = await shopkeeperService.findOne(Number(req.params.id)); // Handshake with findOne
-      if (!result) return res.status(404).json({ message: "Shopkeeper not found" });
-      res.json(result);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
+  // GET ONE
+  static getOne = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await shopkeeperService.findOne(Number(req.params.id));
+      if (!result) {
+        res.status(404).json({ message: "Shopkeeper not found" });
+        return;
+      }
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
     }
-  }
+  );
 
-  static async create(req: Request, res: Response) {
-    try {
-      // Passes the body (DTO) to the service
-      const result = await shopkeeperService.create(req.body); // Handshake with create
-      res.status(201).json(result);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
+  // CREATE
+  static create = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const shopkeeperData = req.body;
+      const result = await shopkeeperService.create(shopkeeperData);
+      res.status(201).json({
+        message: "Shopkeeper created successfully",
+        data: result,
+      });
     }
-  }
+  );
 
-  static async update(req: Request, res: Response) {
-    try {
-      const result = await shopkeeperService.update(Number(req.params.id), req.body); // Handshake with update
-      res.json(result);
-    } catch (error: any) {
-      res.status(400).json({ error: error.message });
+  // UPDATE
+  static update = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      const result = await shopkeeperService.update(Number(req.params.id), req.body);
+      res.status(200).json({
+        message: "Shopkeeper updated successfully",
+        data: result,
+      });
     }
-  }
+  );
 
-  static async delete(req: Request, res: Response) {
-    try {
-      await shopkeeperService.delete(Number(req.params.id)); // Handshake with delete
+  // DELETE
+  static delete = asyncHandler(
+    async (req: Request, res: Response): Promise<void> => {
+      await shopkeeperService.delete(Number(req.params.id));
       res.status(204).send();
-    } catch (error: any) {
-      res.status(404).json({ error: error.message });
     }
-  }
+  );
 }
