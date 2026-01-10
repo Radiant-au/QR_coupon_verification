@@ -77,13 +77,16 @@ export class ShopController {
   );
 
   // HARD DELETE SHOP
-  deleteShop = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
-      const id = parseInt(req.params.id, 10);
-      await ShopService.deleteShop(id);
-      res.status(200).json({
-        message: "Shop deleted successfully",
-      });
-    }
-  );
+
+deleteShop = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const id = parseInt(req.params.id, 10);
+    const force = req.query.force === "true";
+    await ShopService.hardDeleteShop(id, force);
+    res.status(200).json({
+      message: "Shop deleted successfully",
+    });
+  }
+);
+
 }

@@ -124,17 +124,26 @@ const shop = await ShopRepository.findOneBy({ id });
   }
 
   // hard delete
-  static async deleteShop(id: number): Promise<void> {
-    const shop = await ShopRepository.findOne({
-      where: { id },
-    });
+static async hardDeleteShop(id: number, force = false): Promise<void> {
+  // 1. Find the shop with its shopkeepers
+  const shop = await ShopRepository.findOne({
+    where: { id },
+    relations: ['shopkeepers'],
+  });
 
-    if (!shop) {
-      throw new AppError("Shop not found", 404);
-    }
-
-    await ShopRepository.remove(shop);
+  if (!shop) {
+    throw new AppError("Shop not found", 404);
   }
+
+  // 2. Safe check: throw error if shopkeepers exist
+  if (shop.shopkeepers && shop.shopkeepers.length > 0 && !force) {
+    throw new AppError("Cannot delete shop: it has registered shopkeepers", 400);
+  }
+
+  // 3. Cascade will automatically delete shopkeepers if force = true
+  await ShopRepository.remove(shop);
+}
+
 
   
 
