@@ -6,10 +6,6 @@ export class CreateShopkeeperDTO {
 
   @IsString()
   @IsNotEmpty()
-  name: string;          // Display name (can be duplicate)
-
-  @IsString()
-  @IsNotEmpty()
   username: string;      // Login identifier (MUST be unique)
 
   @IsString()
@@ -24,9 +20,6 @@ export class CreateShopkeeperDTO {
 export class RegisterResponseDTO {
   @IsInt()
   id: number;
-
-  @IsString()
-  name: string;
 
   @IsString()
   username: string;

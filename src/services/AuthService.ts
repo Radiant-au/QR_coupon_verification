@@ -12,7 +12,6 @@ export class ShopKeeperAuthService {
         data: CreateShopkeeperDTO
     ): Promise<RegisterResponseDTO> {
 
-        const name = data.name.trim();
         const username = data.username.trim();
 
         const existingShopKeeper = await ShopKeeperRepository.findOneBy({
@@ -32,7 +31,6 @@ export class ShopKeeperAuthService {
         const hashedPassword = await HashUtils.hashPassword(data.password);
 
         const newShopKeeper = ShopKeeperRepository.create({
-            name: name,
             username: username,
             password: hashedPassword,
             shop: shop,
@@ -42,7 +40,6 @@ export class ShopKeeperAuthService {
 
         return {
             id: savedShopKeeper.id,
-            name: savedShopKeeper.name,
             username: savedShopKeeper.username,
         };
     }
@@ -76,12 +73,18 @@ export class ShopKeeperAuthService {
             throw new AppError("Shop is inactive", 403);
         }
 
-        //  jwt token
-        const token = jwt.sign(
-            { shopkeeperId: shopkeeper.id, shopkeepername: shopkeeper.username },
-            process.env.JWT_SECRET ?? "defaultSecret",
-            { expiresIn: `${Number(process.env.JWT_EXPIRE_MINUTES) || 1440}m` }
-        );
+    
+
+        // jwt token
+    const token = jwt.sign(
+    {
+        shopkeeperId: shopkeeper.id,
+        role: "shopkeeper"
+    },
+    process.env.JWT_SECRET ?? "defaultSecret",
+    { expiresIn: `${Number(process.env.JWT_EXPIRE_MINUTES) || 1440}m` }
+    );
+
 
         return { token };
     }

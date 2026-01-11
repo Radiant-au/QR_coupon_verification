@@ -33,28 +33,7 @@ export class ShopkeeperController {
     }
   );
 
-  // CREATE
-  static create = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
-      const shopkeeperData = req.body;
-      const result = await shopkeeperService.create(shopkeeperData);
-      res.status(201).json({
-        message: "Shopkeeper created successfully",
-        data: result,
-      });
-    }
-  );
 
-  // UPDATE
-  static update = asyncHandler(
-    async (req: Request, res: Response): Promise<void> => {
-      const result = await shopkeeperService.update(Number(req.params.id), req.body);
-      res.status(200).json({
-        message: "Shopkeeper updated successfully",
-        data: result,
-      });
-    }
-  );
 
   // DELETE
   static delete = asyncHandler(

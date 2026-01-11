@@ -31,7 +31,7 @@ app.get('/health', (req, res) => {
 // app.use('/', cors({}), express.static(path.join(__dirname, '../uploads')));
 
 app.get('/', (req , res) => {
-    res.send('Welcome to the vote AP');
+    res.send('Welcome to the Shop QR Verification System.');
 });
 
 // Mount all routes under /api
