@@ -29,7 +29,7 @@ export class ShopKeeperAuthService {
         if (!shop) {  throw new AppError("Shop not found or inactive", 404); }
 
 
-        const hashedPassword = HashUtils.hashPassword(data.password);
+        const hashedPassword = await HashUtils.hashPassword(data.password);
 
         const newShopKeeper = ShopKeeperRepository.create({
             name: name,

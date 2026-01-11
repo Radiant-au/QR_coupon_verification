@@ -1,11 +1,14 @@
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 
 export class HashUtils {
-  static hashPassword(password: string): string {
-    return bcrypt.hashSync(password, 10);
+  // Async password hashing
+  static async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    return await bcryptjs.hash(password, saltRounds);
   }
 
-  static comparePassword(password: string, hashed: string): boolean {
-    return bcrypt.compareSync(password, hashed);
+  // Async password comparison
+  static async comparePassword(password: string, hashed: string): Promise<boolean> {
+    return await bcryptjs.compare(password, hashed);
   }
 }
