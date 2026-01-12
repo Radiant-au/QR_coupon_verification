@@ -1,9 +1,11 @@
 import { Router } from "express";
 import ShopRoute from "@routes/ShopRoute"
+import AuthRoute from "@routes/AuthRoute"
 import ShopkeeperRoute from "@routes/ShopkeeperRoute"
 
 const router = Router();
 
+router.use("/auth",AuthRoute);
 // router.use("/pinCode", PinCodeRoute);
 // router.use("/auth", AuthRoute);
 // router.use("/selection", SelectionRoute);

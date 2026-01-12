@@ -17,7 +17,7 @@ export class Shop {
   createdAt: Date;
 
   // Relations
-  @OneToMany(() => Shopkeeper, shopkeeper => shopkeeper.shop)
+  @OneToMany(() => Shopkeeper, shopkeeper => shopkeeper.shop, { cascade: true })
   shopkeepers: Shopkeeper[];
 
   @OneToMany(() => Coupon, coupon => coupon.redeemedAtShop)

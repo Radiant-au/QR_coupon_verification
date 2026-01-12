@@ -14,17 +14,6 @@ router.get("/", ShopkeeperController.getAll);
  */
 router.get("/:id", ShopkeeperController.getOne);
 
-/**
- * @route   POST /api/shopkeepers
- * @desc    Create a new shopkeeper
- */
-router.post("/add", ShopkeeperController.create);
-
-/**
- * @route   PUT /api/shopkeepers/:id
- * @desc    Update an existing shopkeeper
- */
-router.put("/:id", ShopkeeperController.update);
 
 /**
  * @route   DELETE /api/shopkeepers/:id
