@@ -5,8 +5,8 @@ const router = Router();
 const shopKeeperController = new ShopKeeperController();
 
 // Shopkeeper Routes
-router.post("/register", shopKeeperController.registerShopKeeper);
-router.post("/login", shopKeeperController.loginShopKeeper);
+router.post("/admin", shopKeeperController.loginAdmin);
+router.post("/shopkeeper", shopKeeperController.loginShopKeeper);
 // router.get("/", shopKeeperController.getAllShopKeepers);
 // router.get("/:id", shopKeeperController.getShopKeeperById);
 

@@ -16,9 +16,6 @@ export class Shopkeeper {
   @Column({ type: 'int', default: 0 })
   totalScanned: number; // How many coupons they've scanned
 
-  @Column({ type: 'boolean', default: true })
-  isActive: boolean;
-
   @CreateDateColumn()
   createdAt: Date;
 

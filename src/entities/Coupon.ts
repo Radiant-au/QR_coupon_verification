@@ -3,11 +3,13 @@ import { Shop } from "./Shop";
 import { Shopkeeper } from "./Shopkeeper";
 
 @Entity()
+@Index(['id', 'pinCode']) 
+@Index(['status', 'scannedAt']) 
 export class Coupon {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20, unique: true })
+  @Column({ type: 'varchar', length: 10, unique: true })
   @Index()
   pinCode: string; // From voting system (e.g., "1LSY7Z")
 
@@ -18,12 +20,6 @@ export class Coupon {
   })
   @Index()
   status: 'unused' | 'used';
-
-  @Column({ type: 'int', nullable: true })
-  redeemedAtShopId: number;
-
-  @Column({ type: 'int', nullable: true })
-  scannedByShopkeeperId: number;
 
   @Column({ type: 'timestamp', nullable: true })
   scannedAt: Date;

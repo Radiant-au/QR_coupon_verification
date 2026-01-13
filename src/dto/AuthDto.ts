@@ -1,31 +1,5 @@
-import { IsInt, IsNotEmpty, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
-
-// registe request
-export class CreateShopkeeperDTO {
-
-  @IsString()
-  @IsNotEmpty()
-  username: string;      // Login identifier (MUST be unique)
-
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-
-  @IsInt()
-  shopId: number;
-}
-
-//register response
-export class RegisterResponseDTO {
-  @IsInt()
-  id: number;
-
-  @IsString()
-  username: string;
-}
-
-//---------------
 // login request
 export class LoginRequestDTO {
 

@@ -1,0 +1,254 @@
+PROJECT: Shop QR Verification System (shop-qr)
+
+1) High-level purpose
+- This backend provides:
+  - Admin login (JWT)
+  - Admin-only management of Shops and Shopkeepers
+  - Coupon QR token generation by pinCode
+  - Coupon redemption by authenticated Shopkeeper (scan workflow)
+- Tech stack:
+  - Node.js + Express
+  - TypeScript
+  - PostgreSQL + TypeORM
+  - JWT auth (jsonwebtoken)
+
+2) Request flow (how routing works)
+- Entry point: src/index.ts
+  - Initializes DB: AppDataSource.initialize()
+  - Creates express app, applies middleware (helmet, cors, json parser)
+  - Mounts API router under /api:
+    app.use("/api", apiRouter)
+
+- Router composition: src/routes/index.ts
+  - /api/auth        -> AuthRoute
+  - /api/shop        -> ShopRoute (protected by authenticateAdminToken)
+  - /api/shopkeeper  -> ShopkeeperRoute (protected by authenticateAdminToken)
+  - /api/coupon      -> CouponRoute
+
+- Typical call chain
+  Route -> Controller -> Service -> Repository -> Entity -> Database
+
+  Example (Create Shop):
+  POST /api/shop
+    -> ShopController.createShop
+    -> ShopService.createShop
+    -> ShopRepository.save(new Shop())
+    -> inserts into "shop" table
+
+3) Folder structure (src/)
+- config/
+  - env.ts
+    - loads dotenv and validates required env variables
+  - data-source.ts
+    - TypeORM DataSource configuration (Postgres)
+
+- routes/
+  - Express route definitions; they only wire endpoints to controllers + auth middleware
+
+- controllers/
+  - Handles HTTP-level concerns (req/res), calls services
+  - Uses asyncHandler wrapper for error propagation
+
+- services/
+  - Business logic (validation beyond DTOs, DB operations, auth token creation)
+
+- entities/
+  - TypeORM entities (tables) and their relations
+
+- repositories/
+  - TypeORM repositories obtained from AppDataSource
+
+- middlewares/
+  - AuthMiddleware.ts
+    - authenticateAdminToken
+    - authenticateShopKeeperToken
+  - ValidationMiddleware.ts
+    - validateBody(DTOClass) using class-validator
+  - handler.ts
+    - asyncHandler + errorHandler (central error formatting)
+
+- dto/
+  - DTO classes for request validation and response shapes
+
+- utils/
+  - AppError (custom error)
+  - hash (HashUtils)
+
+4) Database model (Entities and relationships)
+
+4.1 Admin (src/entities/Admin.ts)
+- Fields
+  - id (PK)
+  - username (unique)
+  - password (hashed)
+  - createdAt, updatedAt
+- Used for: admin login only
+
+4.2 Shop (src/entities/Shop.ts)
+- Fields
+  - id (PK)
+  - shopName
+  - isActive (default true)
+  - createdAt
+- Relationships
+  - One Shop -> Many Shopkeepers
+    - Shop.shopkeepers
+    - cascade: true
+  - One Shop -> Many Coupons redeemed at that shop
+    - Shop.scannedCoupons
+
+4.3 Shopkeeper (src/entities/Shopkeeper.ts)
+- Fields
+  - id (PK)
+  - username (unique)
+  - password (hashed)
+  - totalScanned (int, default 0)
+  - createdAt, updatedAt
+- Relationships
+  - Many Shopkeepers -> One Shop
+    - Shopkeeper.shop (FK: shopId)
+  - One Shopkeeper -> Many scanned coupons
+    - Shopkeeper.scannedCoupons
+
+4.4 Coupon (src/entities/Coupon.ts)
+- Fields
+  - id (PK)
+  - pinCode (unique, indexed)
+  - status: 'unused' | 'used' (indexed)
+  - scannedAt (nullable)
+  - createdAt, updatedAt
+- Relationships
+  - Many Coupons -> One redeemedAtShop (nullable)
+    - FK: redeemedAtShopId
+  - Many Coupons -> One scannedBy (nullable)
+    - FK: scannedByShopkeeperId
+
+5) Authentication (JWT) and authorization rules
+
+5.1 Admin auth
+- Login endpoint:
+  - POST /api/auth/admin
+- On success returns:
+  - { data: { token: string } }
+- Admin-only routes are protected by authenticateAdminToken middleware.
+  - It reads Authorization: Bearer <token>
+  - jwt.verify() -> expects payload containing userId
+  - Then it checks that Admin exists in DB
+
+5.2 Shopkeeper auth
+- Login endpoint:
+  - POST /api/auth/shopkeeper
+- On success returns:
+  - { data: { token: string } }
+- Coupon redeem endpoint is protected by authenticateShopKeeperToken middleware.
+  - It reads Authorization: Bearer <token>
+  - jwt.verify() -> expects payload with role === "shopkeeper"
+
+IMPORTANT for frontend:
+- Always send JWT in header:
+  Authorization: Bearer <token>
+
+6) Public API endpoints (what frontend should call)
+
+6.1 Health check
+- GET /health
+  - returns server status
+
+6.2 Auth
+- POST /api/auth/admin
+  - body: { username: string, password: string }
+  - success: token for admin
+
+- POST /api/auth/shopkeeper
+  - body: { username: string, password: string }
+  - success: token for shopkeeper
+
+6.3 Shops (admin token required)
+Base path: /api/shop
+- POST /
+  - body: CreateShopRequestDto
+  - creates shop
+
+- GET /
+  - list shops
+
+- GET /:id
+  - get shop
+
+- PUT /:id
+  - body: UpdateShopRequestDto
+  - updates shop fields
+
+- PATCH /:id/deactivate
+  - sets isActive=false
+
+- PATCH /:id/restore
+  - sets isActive=true
+
+- DELETE /:id
+  - query: ?force=true (optional)
+  - deletes shop; if shop has shopkeepers and force is not true -> error
+
+6.4 Shopkeepers (admin token required)
+Base path: /api/shopkeeper
+- GET /
+  - list shopkeepers with shop relation
+
+- GET /:id
+  - single shopkeeper
+
+- POST /
+  - body: CreateShopkeeperDTO { username, password, shopId }
+  - creates shopkeeper for an ACTIVE shop
+
+- DELETE /:id
+  - deletes shopkeeper
+
+6.5 Coupons / QR
+Base path: /api/coupon
+
+- GET /:pinCode
+  - Generates a QR token for an existing coupon pinCode that is still 'unused'
+  - Response includes:
+    - token: base64(JSON({ pinCode, couponId, signature }))
+    - signature is HMAC-SHA256 to prevent QR tampering
+
+- PUT /
+  - Protected (shopkeeper token required)
+  - Headers: Authorization: Bearer <shopkeeper_token>
+  - Body: RedeemCouponReqDto (must include token)
+  - Flow:
+    - decode base64 token
+    - verify HMAC signature
+    - fetch coupon by id+pinCode
+    - reject if already used
+    - mark coupon used, set scannedAt, set redeemedAtShop, set scannedBy
+
+7) Practical notes for frontend integration
+- Admin flow:
+  - Call /api/auth/admin -> store token -> call admin-only routes with Bearer token
+
+- Shopkeeper flow:
+  - Call /api/auth/shopkeeper -> store token -> redeem coupons using PUT /api/coupon
+
+- QR flow:
+  - Voting frontend (or admin tool) calls GET /api/coupon/:pinCode to get QR "token"
+  - QR code content should be that returned "token" string
+  - Shopkeeper scanning app sends that token back to backend via PUT /api/coupon
+
+8) Environment variables used by code
+- Required (validated in src/config/env.ts)
+  - DB_HOST
+  - DB_PORT
+  - DB_USERNAME
+  - DB_PASSWORD
+  - DB_NAME
+  - JWT_SECRET
+
+- Optional
+  - JWT_EXPIRE_MINUTES (default 15)
+  - PORT (default 5000)
+  - ENV (default development)
+  - DB_SSL (default false)
+  - CORS_ORIGINS (comma-separated)
+  - COUPON_SECRET_KEY (used for HMAC signing in CouponService; default fallback exists but should be set in real deployments)

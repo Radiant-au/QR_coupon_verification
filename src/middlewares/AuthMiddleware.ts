@@ -12,9 +12,12 @@ export async function authenticateShopKeeperToken(req: Request, res: Response, n
     }
   
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret") as { id: number; code?: string };
-      (req as any).user = decoded;
-      next();
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret") as { id: number; role: string };
+      if(decoded.role === "shopkeeper"){
+        next()
+      }else{
+        res.status(401).json({ message: "Unauthorized" });
+      }
     } catch (err) {
       res.status(401).json({ message: "Token is not valid or expired" });
     }
@@ -30,12 +33,12 @@ export async function authenticateAdminToken(req: Request, res: Response, next: 
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret") as { userId: number };
-    if (!decoded?.userId) {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret") as { id: number };
+    if (!decoded?.id) {
       res.status(401).json({ message: "Invalid token payload" });
       return;
     }
-    const admin = await AdminRepository.findOneBy({id : decoded.userId});
+    const admin = await AdminRepository.findOneBy({id : decoded.id});
     if(admin){
         next();
     }else{
