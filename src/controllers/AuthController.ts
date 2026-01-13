@@ -5,14 +5,14 @@ import { ShopKeeperAuthService } from "@services/AuthService";
 export class ShopKeeperController {
 
   // REGISTER SHOPKEEPER
-  registerShopKeeper = asyncHandler(
+  loginAdmin = asyncHandler(
     async (req: Request, res: Response): Promise<void> => {
-      const shopKeeperData = req.body;
+      const data = req.body;
 
-      const result = await ShopKeeperAuthService.registerShopKeeper(shopKeeperData);
+      const result = await ShopKeeperAuthService.Adminlogin(data);
 
       res.status(201).json({
-        message: "Shopkeeper registered successfully",
+        message: "Admin logged in successfully",
         data: result,
       });
     }

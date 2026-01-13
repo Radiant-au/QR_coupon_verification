@@ -24,8 +24,8 @@
     "db:log": "npm run docker:typeorm -- schema:log",
     "seed:admin": "docker compose -f docker-compose.yml -f docker-compose.dev.yml exec api npm run seed:admin:inner",
     "seed:admin:inner": "ts-node -r tsconfig-paths/register ./src/scripts/seed-admin.ts",
-    "seed:app": "docker compose -f docker-compose.yml -f docker-compose.dev.yml exec api npm run seed:app:inner",
-    "seed:app:inner": "ts-node -r tsconfig-paths/register ./src/scripts/seed-app.ts"
+    "seed:coupon": "docker compose -f docker-compose.yml -f docker-compose.dev.yml exec api npm run seed:coupon:inner",
+    "seed:coupon:inner": "ts-node -r tsconfig-paths/register ./src/scripts/seed-coupons.ts"
   },
   "keywords": [],
   "author": "",

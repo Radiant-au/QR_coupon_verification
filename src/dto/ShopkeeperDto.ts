@@ -5,11 +5,34 @@ import { IsString, IsNotEmpty, IsInt, MinLength, IsOptional, IsBoolean } from 'c
 /**
  * Used for API responses to hide sensitive data like password
  */
-export class ShopkeeperResponseDto {
+export interface ShopkeeperResponseDto {
   id: number;
   username: string;
   totalScanned: number;
-  isActive: boolean;
   shopId: number;
-  createdAt: Date;
+  shopName: string;
+}
+
+// registe request
+export class CreateShopkeeperDTO {
+
+  @IsString()
+  @IsNotEmpty()
+  username: string;      // Login identifier (MUST be unique)
+
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsInt()
+  shopId: number;
+}
+
+//register response
+export class RegisterResponseDTO {
+  @IsInt()
+  id: number;
+
+  @IsString()
+  username: string;
 }

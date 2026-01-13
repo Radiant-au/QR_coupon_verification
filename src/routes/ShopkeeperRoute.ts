@@ -1,24 +1,12 @@
 import { Router } from "express";
 import { ShopkeeperController } from "../controllers/ShopkeeperController";
+import { validateBody } from "@middlewares/ValidationMiddleware";
+import { CreateShopkeeperDTO } from "@dtos/ShopkeeperDto";
 const router = Router();
 
-/**
- * @route   GET /api/shopkeepers
- * @desc    Get all shopkeepers
- */
 router.get("/", ShopkeeperController.getAll);
-
-/**
- * @route   GET /api/shopkeepers/:id
- * @desc    Get a single shopkeeper by ID
- */
 router.get("/:id", ShopkeeperController.getOne);
-
-
-/**
- * @route   DELETE /api/shopkeepers/:id
- * @desc    Delete a shopkeeper
- */
+router.post("/",validateBody(CreateShopkeeperDTO) ,ShopkeeperController.create);
 router.delete("/:id", ShopkeeperController.delete);
 
 export default router;

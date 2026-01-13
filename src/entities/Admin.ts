@@ -11,9 +11,6 @@ export class Admin {
   @Column({ type: 'varchar', length: 255 })
   password: string; // Hashed
 
-  @Column({ type: 'boolean', default: true })
-  isActive: boolean;
-
   @CreateDateColumn()
   createdAt: Date;
 

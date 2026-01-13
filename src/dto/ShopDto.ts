@@ -5,10 +5,6 @@ export class CreateShopRequestDto {
   @IsString({ message: "Shop name must be a string" })
   @Length(1, 100, { message: "Shop name must be between 1 and 100 characters" })
   shopName: string;
-
-  @IsOptional()
-  @IsBoolean({ message: "isActive must be a boolean" })
-  isActive?: boolean;
 }
 
 

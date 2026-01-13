@@ -1,25 +1,71 @@
-import { AppDataSource } from "../config/data-source";
+import { CreateShopkeeperDTO, RegisterResponseDTO, ShopkeeperResponseDto } from "@dtos/ShopkeeperDto";
 import { Shopkeeper } from "../entities/Shopkeeper";
-import { Shop } from "../entities/Shop";
-import {  ShopkeeperResponseDto } from "../dto/ShopkeeperDto";
+import { ShopKeeperRepository } from "@repositories/ShopKeeperRepository";
+import { HashUtils } from "@utils/hash";
+import { AppError } from "@utils/AppError";
+import { ShopRepository } from "@repositories/ShopRepository";
+import jwt from "jsonwebtoken";
 
 export class ShopkeeperService {
-  private shopkeeperRepo = AppDataSource.getRepository(Shopkeeper);
-  private shopRepo = AppDataSource.getRepository(Shop);
 
-  
+  async registerShopKeeper(
+    data: CreateShopkeeperDTO
+  ): Promise<RegisterResponseDTO> {
+    const username = data.username.trim();
+
+    const existingShopKeeper = await ShopKeeperRepository.findOneBy({
+      username,
+    });
+
+    if (existingShopKeeper) {
+      throw new AppError("Username already exists", 400);
+    }
+
+    const shop = await ShopRepository.findOneBy({
+      id: data.shopId,
+      isActive: true,
+    });
+
+    if (!shop) {
+      throw new AppError("Shop not found or inactive", 404);
+    }
+
+    const hashedPassword = await HashUtils.hashPassword(data.password);
+
+    const newShopKeeper = ShopKeeperRepository.create({
+      username: username,
+      password: hashedPassword,
+      shop: shop,
+    });
+
+    const savedShopKeeper = await ShopKeeperRepository.save(newShopKeeper);
+
+    return {
+      id: savedShopKeeper.id,
+      username: savedShopKeeper.username,
+    };
+  }
+
+  static getShopKeeperFromJWT(token: string) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "default secret") as { id: number; username: string };
+      return decoded.id;
+    } catch (error) {
+      throw new AppError("Invalid or expired token", 401);
+    }
+  }
 
   // HANDSHAKE: findAll
   async findAll(): Promise<ShopkeeperResponseDto[]> {
-    const list = await this.shopkeeperRepo.find({ relations: ["shop"] });
+    const list = await ShopKeeperRepository.find({ relations: ["shop"] });
     return list.map(sk => this.mapToResponseDto(sk));
   }
 
   // HANDSHAKE: findOne
   async findOne(id: number): Promise<ShopkeeperResponseDto | null> {
-    const sk = await this.shopkeeperRepo.findOne({ 
-      where: { id }, 
-      relations: ["shop"] 
+    const sk = await ShopKeeperRepository.findOne({
+      where: { id },
+      relations: ["shop"]
     });
     return sk ? this.mapToResponseDto(sk) : null;
   }
@@ -27,7 +73,7 @@ export class ShopkeeperService {
 
   // HANDSHAKE: delete
   async delete(id: number): Promise<void> {
-    const result = await this.shopkeeperRepo.delete(id);
+    const result = await ShopKeeperRepository.delete(id);
     if (result.affected === 0) throw new Error("Shopkeeper not found");
   }
 
@@ -36,9 +82,8 @@ export class ShopkeeperService {
       id: entity.id,
       username: entity.username,
       totalScanned: entity.totalScanned,
-      isActive: entity.isActive,
       shopId: entity.shop?.id,
-      createdAt: entity.createdAt
+      shopName: entity.shop?.shopName
     };
   }
 }

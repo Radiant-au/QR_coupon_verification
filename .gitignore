@@ -21,3 +21,6 @@ secrets/
 #docker
 docker-compose.dev.yml
 docker-compose.prod.yml
+
+#data
+data/code.json
