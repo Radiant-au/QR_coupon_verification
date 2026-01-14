@@ -13,6 +13,16 @@ export interface ShopkeeperResponseDto {
   shopName: string;
 }
 
+export interface scannedCoupons{
+  id: number;
+  code: string;
+  date: string;
+}
+
+export interface ShopkeeperWithCouponsResponseDto extends ShopkeeperResponseDto {
+  scannedCoupons?: scannedCoupons[];
+}
+
 // registe request
 export class CreateShopkeeperDTO {
 

@@ -23,6 +23,7 @@ export class UpdateShopRequestDto {
 export interface ShopResponse {
   id: number;
   shopName: string;
+  totalScannedCoupons?: number;
   isActive: boolean;
   createdAt: Date;
 }

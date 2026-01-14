@@ -1,4 +1,4 @@
-import { CreateShopkeeperDTO, RegisterResponseDTO, ShopkeeperResponseDto } from "@dtos/ShopkeeperDto";
+import { CreateShopkeeperDTO, RegisterResponseDTO, ShopkeeperResponseDto, ShopkeeperWithCouponsResponseDto } from "@dtos/ShopkeeperDto";
 import { Shopkeeper } from "../entities/Shopkeeper";
 import { ShopKeeperRepository } from "@repositories/ShopKeeperRepository";
 import { HashUtils } from "@utils/hash";
@@ -62,12 +62,23 @@ export class ShopkeeperService {
   }
 
   // HANDSHAKE: findOne
-  async findOne(id: number): Promise<ShopkeeperResponseDto | null> {
+  async findOne(id: number): Promise<ShopkeeperWithCouponsResponseDto | null> {
     const sk = await ShopKeeperRepository.findOne({
       where: { id },
-      relations: ["shop"]
+      relations: ["shop", "scannedCoupons"]
     });
-    return sk ? this.mapToResponseDto(sk) : null;
+    return ({
+      id: sk.id,
+      username: sk.username,
+      totalScanned: sk.totalScanned,
+      shopId: sk.shop?.id,
+      shopName: sk.shop?.shopName,
+      scannedCoupons: sk.scannedCoupons.map(c => ({
+        id: c.id,
+        code: c.pinCode,
+        date: c.scannedAt ? new Date(c.scannedAt).toLocaleString('id-ID', { timeZone: 'Asia/Yangon' }) : null
+      }))
+    });
   }
 
 

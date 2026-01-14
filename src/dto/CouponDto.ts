@@ -12,4 +12,5 @@ export interface RedeemCouponResDto{
 export interface generateQRTokenResDto{
     token: string;
     pinCode: string;
+    status: "used" | "unused";
 }

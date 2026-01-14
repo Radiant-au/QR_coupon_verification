@@ -8,7 +8,7 @@ const router = Router();
 
 router.use("/auth",AuthRoute);
 router.use("/shop", authenticateAdminToken, ShopRoute)
-router.use("/shopkeeper", authenticateAdminToken, ShopkeeperRoute)
+router.use("/shopkeeper", ShopkeeperRoute)
 router.use("/coupon" , CouponRoute)
 
 

@@ -24,12 +24,15 @@ export class ShopService {
     }
     // read all 
     static async getAllShops(): Promise<ShopResponse[]> {
-        const shops = await ShopRepository.find();
+        const shops = await ShopRepository.find({
+            relations: ['scannedCoupons']
+        });
 
         return shops.map((shop) => ({
             id: shop.id,
             shopName: shop.shopName,
             isActive: shop.isActive,
+            totalScannedCoupons: shop.scannedCoupons.length,
             createdAt: shop.createdAt
         }))
     }

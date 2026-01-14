@@ -4,7 +4,6 @@ import { Coupon } from "@entities/Coupon";
 import { Shop } from "@entities/Shop";
 import { Shopkeeper } from "@entities/Shopkeeper";
 import { CouponRepository } from "@repositories/CouponRespository";
-import { ShopKeeperRepository } from "@repositories/ShopKeeperRepository";
 import { ShopRepository } from "@repositories/ShopRepository";
 import { AppError } from "@utils/AppError";
 import * as crypto from 'crypto';
@@ -46,7 +45,7 @@ export class CouponService {
   static async generateStaticQRToken(pinCode: string): Promise<generateQRTokenResDto> {
     // Verify coupon exists and is unused
     const coupon = await CouponRepository.findOne({
-      where: { pinCode, status: 'unused' }
+      where: { pinCode }
     });
 
     if (!coupon) {
@@ -73,7 +72,8 @@ export class CouponService {
 
     return {
       token,
-      pinCode: coupon.pinCode
+      pinCode: coupon.pinCode,
+      status: coupon.status
     };
   }
 
