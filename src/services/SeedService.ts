@@ -20,22 +20,22 @@ export class SeedService {
 
       // Check if admin already exists
       const existingAdmin = await AdminRepository.findOneBy({
-        username: "Aksadmin",
+        username: "Shopadmin",
       });
 
       if (existingAdmin) {
-        console.log("Admin user 'Aksadmin' already exists. Skipping seed.");
+        console.log("Admin user 'Shopadmin' already exists. Skipping seed.");
         return;
       }
 
       // Create new admin user
       const admin = new Admin();
-      admin.username = "Aksadmin";
-      const hashedPassword = await HashUtils.hashPassword("Cqrity@555");
+      admin.username = "Shopadmin";
+      const hashedPassword = await HashUtils.hashPassword("CyberShop@555");
       admin.password = hashedPassword;
 
       await AdminRepository.save(admin);
-      console.log("Admin user 'Aksadmin' created successfully!");
+      console.log("Admin user 'Shopadmin' created successfully!");
     } catch (error) {
       console.error("Error seeding admin user:", error);
       throw error;
